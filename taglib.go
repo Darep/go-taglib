@@ -204,6 +204,31 @@ func (file *File) Track() int {
 	return int(C.taglib_tag_track(file.tag))
 }
 
+// Returns the tag's disc number or 0 if track number is not set.
+func (file *File) Disc() int {
+	glock.Lock()
+	defer glock.Unlock()
+
+	cs := C.CString("DISCNUMBER")
+	cc := C.taglib_property_get(file.fp, cs)
+	for i := 0; ; i++ {
+		elem := (**C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(cc)) + uintptr(i)*unsafe.Sizeof(cc)))
+		if elem == nil {
+			break
+		}
+
+		value := C.GoString((*C.char)(*elem))
+		intValue, convErr := strconv.Atoi(value)
+		if convErr != nil {
+			return 0
+		}
+
+		return intValue
+	}
+
+	return 0
+}
+
 // Returns the length of the file.
 func (file *File) Length() time.Duration {
 	glock.Lock()

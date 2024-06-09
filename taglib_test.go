@@ -81,6 +81,10 @@ func TestTagLib(t *testing.T) {
 		t.Errorf("Got wrong track: %d", track)
 	}
 
+	if disc := file.Disc(); disc != 1 {
+		t.Errorf("Got wrong disc: %d", disc)
+	}
+
 	// Test the properties
 	if length := file.Length(); length != 42*time.Second {
 		t.Errorf("Got wrong length: %s", length)
